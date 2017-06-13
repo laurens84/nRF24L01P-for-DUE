@@ -32,8 +32,8 @@
     <File Name="main.cpp"/>
     <File Name="RF24.cpp"/>
     <File Name="makefile"/>
-    <File Name="RF24.h"/>
     <File Name="nRF24L01.h"/>
+    <File Name="RF24.hpp"/>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">
     <GlobalSettings>

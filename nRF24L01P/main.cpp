@@ -1,7 +1,5 @@
 #include "hwlib.hpp"
-#include <stdint.h>
-#include "nRF24L01.h"
-#include "RF24.h"
+#include "RF24.hpp"
 
 int main( void ){
     // kill the watchdog
@@ -22,12 +20,22 @@ int main( void ){
     
     uint8_t *x;
     
+    int y;
+    
+    y = test.read_rx_payload_width();
+    hwlib::cout << y << '\n';
+    
+    hwlib::wait_ms(1000);
+    
+    x = test.receive();
+    hwlib::cout << unsigned(x[0]) << '\n';
+    
     x = test.read_register(RF_CH);
     hwlib::cout << hwlib::bin << unsigned(x[0]) << '\n' << hwlib::bin << unsigned(x[1]) << '\n';
     
-    test.write_register(RF_CH, 2);
+    test.write_register(RF_CH, 10);
     
-    hwlib::wait_ms(5000);
+    hwlib::wait_ms(1000);
     
     x = test.read_register(RF_CH);
     hwlib::cout << hwlib::bin << unsigned(x[0]) << '\n' << hwlib::bin << unsigned(x[1]) << '\n';
