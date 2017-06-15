@@ -33,7 +33,7 @@ uint8_t* RF24::receive(){
     payload[0] = R_RX_PAYLOAD;
     SPI.write_and_read( CSN, bytes, &*payload, &*payload );
     payload[0] = bytes;
-    this->write_register(NRF_STATUS, (1<<(RX_DR - 1)));
+    this->clear_bit(NRF_STATUS, RX_DR);
     return payload;
 }
 
@@ -47,10 +47,54 @@ bool RF24::send(const uint8_t* tx_payload, const int bytes){
     CE.set(1);
     hwlib::wait_us(10);
     CE.set(0);
-    if ((this->read_register(NRF_STATUS)[1] << (TX_DS - 1)) & 1){
-        this->write_register(NRF_STATUS, (1 << (TX_DS - 1)));
+    
+    if (this->check_bit(NRF_STATUS, TX_DS)){
+        this->set_bit(NRF_STATUS, TX_DS);
         return true;
     }
     else
         return false;
+}
+
+void RF24::flush_tx(){
+    dataout[0] = FLUSH_TX;
+    SPI.write_and_read(CSN, 1, &*dataout, nullptr);
+    return;
+}
+
+void RF24::flush_rx(){
+    dataout[0] = FLUSH_RX;
+    SPI.write_and_read(CSN, 1, &*dataout, nullptr);
+    return;
+}
+
+void RF24::set_channel(int channel){
+    this->write_register(RF_CH, channel);
+    return;
+}
+
+bool RF24::check_bit(uint8_t reg, int bit){
+    uint8_t regsetting = this->read_register(reg)[1];
+    bool bitstate = (regsetting >> (bit - 1)) & 1;
+    return bitstate;
+}
+
+void RF24::set_bit(uint8_t reg, int bit){
+    uint8_t regsetting = this->read_register(reg)[1];
+    regsetting |= (1 << (bit - 1));
+    this->write_register(reg, regsetting);
+    return;
+}
+
+void RF24::clear_bit(uint8_t reg, int bit){
+    uint8_t regsetting = 0;
+    if (reg == NRF_STATUS){
+        regsetting |= (1 << (bit - 1));
+    }
+    else {
+        regsetting = this->read_register(reg)[1];
+        regsetting &= ~(1 << (bit - 1));
+    }
+    this->write_register(reg, regsetting);
+    return;
 }

@@ -18,6 +18,12 @@ public:
     int read_rx_payload_width();
     uint8_t* receive();
     bool send(const uint8_t* tx_payload, const int bytes);
+    void flush_tx();
+    void flush_rx();
+    void set_channel(int channel);
+    bool check_bit(uint8_t reg, int bit);
+    void set_bit(uint8_t reg, int bit);
+    void clear_bit(uint8_t reg, int bit);
 };
 
 #endif
